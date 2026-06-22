@@ -27,11 +27,10 @@
         {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
         {% if tab_name == 'categories' %}
           <li class="nav-item">
-            <a href="#" class="nav-link d-flex justify-content-between align-items-center" onclick="toggleCategories(event)">
+            <a href="{{ tab.url | relative_url }}" class="nav-link">
               <span>CATEGORIES</span>
-              <i class="fa-solid fa-chevron-up ms-2" id="categories-arrow"></i>
             </a>
-            <ul class="nav flex-column ps-3" id="categories-list">
+            <ul class="nav flex-column ps-3">
               {% assign all_categories = site.posts | map: 'categories' | flatten | uniq | sort %}
               {% for category in all_categories %}
                 <li class="nav-item">
@@ -71,27 +70,4 @@
       {% endif %}
     {% endfor %}
   </div>
-
-  <script>
-    var list = document.getElementById('categories-list');
-    var arrow = document.getElementById('categories-arrow');
-
-    if (localStorage.getItem('categoriesOpen') === 'false') {
-      list.style.display = 'none';
-      arrow.style.transform = 'rotate(180deg)';
-    }
-
-    function toggleCategories(e) {
-      e.preventDefault();
-      if (list.style.display === 'none') {
-        list.style.display = 'block';
-        arrow.style.transform = 'rotate(0deg)';
-        localStorage.setItem('categoriesOpen', 'true');
-      } else {
-        list.style.display = 'none';
-        arrow.style.transform = 'rotate(180deg)';
-        localStorage.setItem('categoriesOpen', 'false');
-      }
-    }
-  </script>
 </aside>

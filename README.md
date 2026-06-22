@@ -1,1 +1,1 @@
-https://eundev00.https://eundev00.github.io
+https://eundev00.github.io

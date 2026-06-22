@@ -6,7 +6,6 @@ a[aria-expanded="false"] .collapse-arrow {
   transform: rotate(180deg);
 }
 
-#categories-list {
+nav .nav > li {
   list-style: none;
-  padding-left: 0;
 }

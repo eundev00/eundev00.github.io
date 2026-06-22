@@ -36,7 +36,7 @@
               {% assign all_categories = site.posts | map: 'categories' | flatten | uniq | sort %}
               {% for category in all_categories %}
                 <li class="nav-item">
-                  <a href="{{ '/categories/' | append: category | slugify | relative_url }}" class="nav-link py-1" style="font-size: 0.85rem;">
+                  <a href="{{ site.baseurl }}/categories/{{ category | slugify }}/" class="nav-link py-1" style="font-size: 0.85rem;">
                     {{ category }}
                   </a>
                 </li>

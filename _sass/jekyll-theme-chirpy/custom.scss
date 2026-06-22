@@ -1,0 +1,7 @@
+.collapse-arrow {
+  transition: transform 0.3s ease;
+}
+
+a[aria-expanded="false"] .collapse-arrow {
+  transform: rotate(180deg);
+}

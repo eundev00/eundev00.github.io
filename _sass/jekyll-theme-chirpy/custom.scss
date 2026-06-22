@@ -6,6 +6,7 @@ a[aria-expanded="false"] .collapse-arrow {
   transform: rotate(180deg);
 }
 
-nav .nav > li {
-  list-style: none;
+#sidebar ul, #sidebar li {
+  list-style: none !important;
+  padding-left: 0;
 }

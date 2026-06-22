@@ -28,7 +28,7 @@
         {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
         {% if tab_name == 'categories' %}
           <li class="nav-item">
-            <a href="#categories-list" class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" aria-expanded="true">
+            <a href="#categories-list" class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#categories-list" aria-expanded="true">
               <span>
                 <i class="fa-fw {{ tab.icon }}"></i>
                 <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>

@@ -116,9 +116,7 @@
           {%- unless site.github.username -%}
             {%- continue -%}
           {%- endunless -%}
-          {%- capture url -%}
-            https://github.com/{{ site.github.username }}
-          {%- endcapture -%}
+          {%- capture url -%}https://github.com/{{ site.github.username }}{%- endcapture -%}
         {% else %}
           {%- continue -%}
       {% endcase %}

@@ -16,7 +16,7 @@ timezone:
 
 title: Unity Dev Blog # the main title
 
-tagline: - # it will display as the subtitle
+tagline: # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
@@ -35,7 +35,7 @@ social:
   email: eunv00@gmail.com # change to your email address
   fediverse_handle: # fill in your fediverse handle. E.g. "@username@domain.com"
   links:
-     - https://github.com/eundev00 # change to your GitHub homepage
+    - https://github.com/eundev00 # change to your GitHub homepage
    
 
 # Site Verification Settings

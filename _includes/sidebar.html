@@ -35,9 +35,9 @@
             <ul class="nav flex-column ps-3">
               {% assign all_categories = site.posts | map: 'categories' | flatten | uniq | sort %}
               {% for category in all_categories %}
-                {% capture category_url %}{{ site.baseurl }}/categories/{{ category | slugify }}/{% endcapture %}
+                {% capture category_url %}/categories/{{ category | slugify }}/{% endcapture %}
                 <li class="nav-item{% if page.url == category_url %} active{% endif %}">
-                  <a href="{{ category_url }}" class="nav-link py-1" style="font-size: 0.85rem;">
+                  <a href="{{ category_url | relative_url }}" class="nav-link py-1" style="font-size: 0.85rem;">
                     {{ category }}
                   </a>
                 </li>

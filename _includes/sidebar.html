@@ -28,7 +28,7 @@
       {% for tab in site.tabs %}
         {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
         {% if tab_name == 'categories' %}
-          <li class="nav-item{% if page.layout == 'categories' %}{{ " active" }}{% endif %}">
+          <li class="nav-item{% if page.url == '/categories/' %}{{ " active" }}{% endif %}">
             <a href="{{ tab.url | relative_url }}" class="nav-link">
               <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
             </a>

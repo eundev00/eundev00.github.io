@@ -5,3 +5,8 @@
 a[aria-expanded="false"] .collapse-arrow {
   transform: rotate(180deg);
 }
+
+#categories-list {
+  list-style: none;
+  padding-left: 0;
+}

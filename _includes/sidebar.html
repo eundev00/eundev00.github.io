@@ -28,15 +28,16 @@
       {% for tab in site.tabs %}
         {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
         {% if tab_name == 'categories' %}
-          <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
+          <li class="nav-item{% if page.layout == 'categories' %}{{ " active" }}{% endif %}">
             <a href="{{ tab.url | relative_url }}" class="nav-link">
               <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
             </a>
             <ul class="nav flex-column ps-3">
               {% assign all_categories = site.posts | map: 'categories' | flatten | uniq | sort %}
               {% for category in all_categories %}
-                <li class="nav-item">
-                  <a href="{{ site.baseurl }}/categories/{{ category | slugify }}/" class="nav-link py-1" style="font-size: 0.85rem;">
+                {% capture category_url %}{{ site.baseurl }}/categories/{{ category | slugify }}/{% endcapture %}
+                <li class="nav-item{% if page.url == category_url %} active{% endif %}">
+                  <a href="{{ category_url }}" class="nav-link py-1" style="font-size: 0.85rem;">
                     {{ category }}
                   </a>
                 </li>

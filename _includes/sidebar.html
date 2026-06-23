@@ -49,6 +49,132 @@
         {% assign posts_of_category = category | last %}
         {% assign first_post = posts_of_category | first %}
         {% if category_name == first_post.categories[0] %}
+          {% capture top_url %}/categories/{{ category_name | slugify }}/{% endcapture %}
+          <li class="nav-item{% if page.url == top_url %}{{ " active" }}{% endif %}">
+            <a href="{{ top_url | relative_url }}" class="nav-link">
+              <span>{{ category_name | upcase }}</span>
+            </a>
+          </li>
+
+          {% assign sub_categories = '' | split: '' %}
+          {% for post in posts_of_category %}
+            {% assign second_category = post.categories[1] %}
+            {% if second_category %}
+              {% unless sub_categories contains second_category %}
+                {% assign sub_categories = sub_categories | push: second_category %}
+              {% endunless %}
+            {% endif %}
+          {% endfor %}
+          {% assign sub_categories = sub_categories | sort %}
+
+          {% for sub_category in sub_categories %}
+            {% capture sub_url %}/categories/{{ sub_category | slugify }}/{% endcapture %}
+            <li class="nav-item{% if page.url == sub_url %}{{ " active" }}{% endif %}">
+              <a href="{{ sub_url | relative_url }}" class="nav-link py-1 ps-4" style="font-size: 0.9rem;">
+                <span>{{ sub_category }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+
+  <div class="sidebar-bottom d-flex flex-wrap align-items-center w-100">
+    {% unless site.theme_mode == 'light' or site.theme_mode == 'dark' %}
+      {%- capture icon_system -%}
+        <i class="fa-solid fa-display" data-theme-mode="system"></i>
+      {%- endcapture -%}
+
+      {%- capture icon_light -%}
+        <i class="fa-regular fa-sun" data-theme-mode="light"></i>
+      {%- endcapture -%}
+
+      {%- capture icon_dark -%}
+        <i class="fa-regular fa-moon" data-theme-mode="dark"></i>
+      {%- endcapture -%}
+
+      <div class="btn-group dropup">
+        <button
+          type="button"
+          class="btn btn-link nav-link"
+          aria-label="Switch Mode"
+          id="mode-toggle"
+          data-bs-toggle="dropdown"
+        >
+          {{- icon_light -}}
+          {{- icon_dark -}}
+          {{- icon_system -}}
+        </button>
+        <ul class="dropdown-menu rounded-3 mb-1 p-1">
+          <li>
+            <button class="dropdown-item d-flex align-items-center" type="button" data-theme-mode="light">
+              {{- icon_light -}}
+              {{- site.data.locales[lang].theme.light -}}
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-flex align-items-center" type="button" data-theme-mode="dark">
+              {{- icon_dark -}}
+              {{- site.data.locales[lang].theme.dark -}}
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item d-flex align-items-center" type="button" data-theme-mode="system">
+              {{- icon_system -}}
+              {{- site.data.locales[lang].theme.system -}}
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      {% if site.data.contact.size > 0 %}
+        <span class="icon-border"></span>
+      {% endif %}
+    {% endunless %}
+
+    {% for entry in site.data.contact %}
+      {%- assign url = null -%}
+
+      {% case entry.type %}
+        {% when 'github' %}
+          {%- unless site.github.username -%}
+            {%- continue -%}
+          {%- endunless -%}
+          {%- capture url -%}https://github.com/{{ site.github.username }}{%- endcapture -%}
+        {% else %}
+          {%- continue -%}
+      {% endcase %}
+
+      {% if url %}
+        <a
+          href="{{ url }}"
+          aria-label="{{ entry.type }}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <i class="{{ entry.icon }}"></i>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <!-- .sidebar-bottom -->
+</aside>
+<!-- #sidebar -->        <!-- .nav-item -->
+      {% endfor %}
+
+      <!-- divider -->
+      <li class="nav-item" style="width: 100%;">
+        <hr style="margin: 0.75rem 1.5rem; border: 0; border-top: 1px solid var(--sidebar-muted-color, rgba(128,128,128,0.3)); opacity: 0.4;">
+      </li>
+
+      <!-- category tree -->
+      {% assign sort_categories = site.categories | sort %}
+      {% for category in sort_categories %}
+        {% assign category_name = category | first %}
+        {% assign posts_of_category = category | last %}
+        {% assign first_post = posts_of_category | first %}
+        {% if category_name == first_post.categories[0] %}
           {% capture top_url %}/categories/{{ category_name | slugify | url_encode }}/{% endcapture %}
           <li class="nav-item">
             <a href="{{ top_url | relative_url }}" class="nav-link{% if page.url == top_url %}{{ " active" }}{% endif %}">

@@ -24,34 +24,58 @@
           <span>{{ site.data.locales[include.lang].tabs.home | upcase }}</span>
         </a>
       </li>
-      <!-- the real tabs -->
+      <!-- tabs except categories -->
       {% for tab in site.tabs %}
         {% capture tab_name %}{{ tab.url | split: '/' | last }}{% endcapture %}
-        {% if tab_name == 'categories' %}
-          <li class="nav-item">
-            <a href="{{ tab.url | relative_url }}" class="nav-link{% if page.url == '/categories/' %}{{ " active" }}{% endif %}">
-              <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
-            </a>
-            <ul class="nav flex-column ps-3">
-              {% assign all_categories = site.posts | map: 'categories' | flatten | uniq | sort %}
-              {% for category in all_categories %}
-                {% capture category_url %}/categories/{{ category | slugify }}/{% endcapture %}
-                <li class="nav-item">
-                  <a href="{{ category_url | relative_url }}" class="nav-link py-1{% if page.url == category_url %}{{ " active" }}{% endif %}" style="font-size: 0.85rem;">
-                    {{ category }}
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% else %}
+        {% unless tab_name == 'categories' %}
           <li class="nav-item{% if tab.url == page.url %}{{ " active" }}{% endif %}">
             <a href="{{ tab.url | relative_url }}" class="nav-link">
               <span>{{ site.data.locales[include.lang].tabs.[tab_name] | default: tab.title | upcase }}</span>
             </a>
           </li>
-        {% endif %}
+        {% endunless %}
         <!-- .nav-item -->
+      {% endfor %}
+
+      <!-- divider -->
+      <li class="nav-item" style="width: 100%;">
+        <hr style="margin: 0.75rem 1.5rem; border: 0; border-top: 1px solid var(--sidebar-muted-color, rgba(128,128,128,0.3)); opacity: 0.4;">
+      </li>
+
+      <!-- category tree -->
+      {% assign sort_categories = site.categories | sort %}
+      {% for category in sort_categories %}
+        {% assign category_name = category | first %}
+        {% assign posts_of_category = category | last %}
+        {% assign first_post = posts_of_category | first %}
+        {% if category_name == first_post.categories[0] %}
+          {% capture top_url %}/categories/{{ category_name | slugify | url_encode }}/{% endcapture %}
+          <li class="nav-item">
+            <a href="{{ top_url | relative_url }}" class="nav-link{% if page.url == top_url %}{{ " active" }}{% endif %}">
+              <span>{{ category_name | upcase }}</span>
+            </a>
+          </li>
+
+          {% assign sub_categories = '' | split: '' %}
+          {% for post in posts_of_category %}
+            {% assign second_category = post.categories[1] %}
+            {% if second_category %}
+              {% unless sub_categories contains second_category %}
+                {% assign sub_categories = sub_categories | push: second_category %}
+              {% endunless %}
+            {% endif %}
+          {% endfor %}
+          {% assign sub_categories = sub_categories | sort %}
+
+          {% for sub_category in sub_categories %}
+            {% capture sub_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
+            <li class="nav-item">
+              <a href="{{ sub_url | relative_url }}" class="nav-link py-1 ps-4{% if page.url == sub_url %}{{ " active" }}{% endif %}" style="font-size: 0.9rem;">
+                <span>{{ sub_category }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        {% endif %}
       {% endfor %}
     </ul>
   </nav>

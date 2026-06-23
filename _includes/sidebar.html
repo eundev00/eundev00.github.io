@@ -49,11 +49,12 @@
         {% assign posts_of_category = category | last %}
         {% assign first_post = posts_of_category | first %}
         {% if category_name == first_post.categories[0] %}
-          {% capture top_url %}/categories/{{ category_name | slugify }}/{% endcapture %}
+          {% capture top_url %}/categories/{{ category_name | slugify | url_encode }}/{% endcapture %}
           <li class="nav-item">
             <a href="{{ top_url | relative_url }}" class="nav-link{% if page.url == top_url %}{{ " active" }}{% endif %}">
               <span>{{ category_name | upcase }}</span>
             </a>
+            <span style="color:red;font-size:9px;display:block;">url:[{{ page.url }}] top:[{{ top_url }}]</span>
           </li>
 
           {% assign sub_categories = '' | split: '' %}
@@ -68,7 +69,7 @@
           {% assign sub_categories = sub_categories | sort %}
 
           {% for sub_category in sub_categories %}
-            {% capture sub_url %}/categories/{{ sub_category | slugify }}/{% endcapture %}
+            {% capture sub_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
             <li class="nav-item">
               <a href="{{ sub_url | relative_url }}" class="nav-link py-1 ps-4{% if page.url == sub_url %}{{ " active" }}{% endif %}" style="font-size: 0.9rem;">
                 <span>{{ sub_category }}</span>

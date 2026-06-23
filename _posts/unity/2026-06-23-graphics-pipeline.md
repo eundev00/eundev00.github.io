@@ -1,6 +1,6 @@
 ---
 title: 그래픽스 파이프라인 (Graphics Pipeline)
-date: 2026-06-23 22:00:00 +0900
+date: 2026-06-23 09:00:00 +0900
 categories: [Unity, Graphics]
 tags: [graphics, pipeline]
 ---

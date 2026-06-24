@@ -1,6 +1,6 @@
 ---
 
-## title: 코딩테스트 BFS
+title: 코딩테스트 BFS
 date: 2026-06-23 09:00:00 +0900
 categories: [Codingtest]
 tags: [Codingtest, BFS]

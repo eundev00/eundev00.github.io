@@ -1,8 +1,8 @@
 ---
 
-## title: 그래픽스 파이프라인 (Graphics Pipeline)
+## title: 코딩테스트 BFS
 date: 2026-06-23 09:00:00 +0900
-categories: [Codingtest, BFS]
+categories: [Codingtest]
 tags: [Codingtest, BFS]
 
 ---

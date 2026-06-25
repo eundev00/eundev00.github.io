@@ -1,79 +1,177 @@
 ---
-title: 그래픽스 파이프라인 (Graphics Pipeline)
+title: 렌더링 파이프라인
 date: 2026-06-23 09:00:00 +0900
 categories: [Unity, Graphics]
-tags: [graphics, pipeline]
+tags: [graphics, rendering]
 ---
 
-# 그래픽스 파이프라인 (Graphics Pipeline)
-3D 장면을 화면의 2D 이미지로 변환하는 일련의 절차다. Direct3D, OpenGL, Vulkan 같은 그래픽스 API들이 이 파이프라인을 표준화해서, 개발자가 AMD, Nvidia 등 각 하드웨어에 맞는 코드를 따로 짜지 않아도 되게 해준다. 각 단계는 병렬로 실행되며 대부분 GPU에서 처리된다.
+# 렌더링 파이프라인 (Rendering Pipeline)
 
----
+렌더링 파이프라인은 **Draw Call 하나가 발생할 때 GPU 내부에서 처리되는 단계별 흐름**이다. 3D 버텍스 데이터를 받아 최종적으로 화면의 픽셀 색상을 결정하기까지의 과정이다.
 
-### 전체 흐름
+![Shader Pipeline](https://www.cyanilux.com/tutorials/intro-to-the-shader-pipeline/Pipeline.png)
 
-![그래픽스 파이프라인 전체 흐름](https://github.com/user-attachments/assets/ccf5b036-f926-4495-a3b0-99deaaea454a)
+{: .bg-gray }
 
-파이프라인은 크게 세 파트로 나눌 수 있다.
-
-1. **Application**
-2. **Geometry**
-3. **Rasterization**
+*출처: [Cyanilux - Intro to the Shader Pipeline](https://www.cyanilux.com/tutorials/intro-to-the-shader-pipeline/)*
 
 ---
 
-### 1. Application
+## 메시(Mesh)와 버텍스(Vertex)
 
-CPU에서 실행되는 단계다. 사용자 입력, 애니메이션, 충돌 감지 같은 처리가 여기서 일어나고, 수정된 오브젝트 데이터(점, 선, 삼각형 등의 프리미티브)를 다음 단계로 넘긴다.
+화면에 보이는 모든 3D 오브젝트는 **버텍스(Vertex, 점)** 에서 시작한
 
----
+![Mesh Overview](https://upload.wikimedia.org/wikipedia/commons/6/6d/Mesh_overview.svg)
 
-### 2. Geometry
+{: height="150" }
 
-![Geometry 단계](https://github.com/user-attachments/assets/90f65a50-0886-4eb0-be8f-c81dda49a962)
+*출처: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mesh_overview.svg) (CC BY-SA 3.0)*
 
-폴리곤과 정점(Vertex)을 다루는 단계다. 크게 다섯 가지 작업으로 구성된다.
-
-- 모델 / 카메라 변환
-- 라이팅
-- 투영 (Z-buffering)
-- 클리핑
-- 뷰포트 변환
-
-**좌표 변환**
-
-오브젝트는 자기 기준의 로컬 좌표계(모델 좌표계)로 설계된다. 이걸 씬 전체의 월드 좌표계로 변환하고, 다시 카메라 기준 좌표계로 변환한 다음, 최종적으로 화면 좌표계로 변환한다. 이 과정은 변환 행렬(Transformation Matrix)을 곱하는 방식으로 처리된다. 하나의 오브젝트에서 다르게 변환된 복사본을 여러 개 만들 수도 있는데, 예를 들어 나무 하나로 숲을 만드는 것 — 이를 **인스턴싱(Instancing)** 이라고 한다.
-
-씬에는 오브젝트 외에 카메라도 정의된다. 카메라의 위치와 방향을 기준으로 씬 전체가 변환되며, 이를 카메라 변환(View Transformation)이라고 한다.
-
-**투영 (Projection)**
-
-3D 시야 볼륨을 정규화된 좌표로 변환한다. 원근 투영(Perspective)은 멀리 있을수록 작게 보이는 일반적인 3D 시점이고, 직교 투영(Orthographic)은 거리와 상관없이 크기가 동일해서 기술 도면이나 지도 등에 사용된다.
-
-**클리핑 (Clipping)**
-
-시야 볼륨은 절두체(Frustum) 형태로 정의된다. 절두체 완전히 밖에 있는 프리미티브는 버려지는데 — 이를 **Frustum Culling** 이라고 한다. 일부만 걸쳐 있는 프리미티브는 경계면에서 잘린다.
-
-**라이팅**
-
-씬에 배치된 광원에 따라 각 정점마다 텍스처 게인 계수(gain factor)를 계산한다. 이후 래스터화 단계에서 삼각형 표면 전체에 걸쳐 정점값이 보간된다. 주변광(Ambient Light)은 모든 표면에 적용되는 방향 독립적인 밝기다. 태양과 같은 방향성 광원은 광원 방향 벡터와 표면의 법선 벡터의 내적(Dot Product)으로 조명 효과를 계산한다.
-
-**뷰포트 변환**
-
-최종적으로 화면의 특정 영역(뷰포트)에 이미지를 출력하기 위해 Window-Viewport 변환이 적용된다. 결과 좌표가 출력 장치의 디바이스 좌표가 된다.
-
-현대 GPU에서는 이 단계의 대부분이 **Vertex Shader** 에서 실행된다. DirectX 10부터는 커스텀 Vertex Shader 사용이 필수다.
+점들이 모여 선이 되고, 선들이 모여 폴리곤이 되고, 폴리곤들이 모여 메시가 된다. **메시는 결국 버텍스로 이루어져 있다.**
 
 ---
 
-### 3. Rasterization
+## 입력 데이터 (GPU에 전달되는 것들)
 
-연속적인 삼각형 면을 이산적인 픽셀 조각(Fragment)으로 변환하는 단계다. 각 Fragment는 프레임버퍼의 픽셀 하나에 대응된다. 겹치는 폴리곤 처리는 **Z-buffer(깊이 버퍼)** 로 판단한다.
+파이프라인이 시작되기 전, CPU는 아래 데이터를 GPU에 전달한다.
 
-**Fragment Shader** 가 각 Fragment마다 실행되며, 조명, 텍스처, 재질 속성에 따라 픽셀의 최종 색상을 결정한다. 반투명이거나 멀티샘플링이 적용된 경우 이미 있는 색상값과 혼합(Blending)된다.
+| **Vertex Buffer** | 버텍스 위치 정보 목록 — **무엇을 그릴지** |
+| --- | --- |
+| **Index Buffer** | 버텍스를 잇는 순서 (예: `012230`) |
+| **Render State** | 렌더링 방식 설정 (예: Counter Clockwise Triangle List) — **어떻게 그릴지** |
+| **Vertex Decl** | 버텍스 데이터 형식 선언 |
 
-렌더링이 진행되는 동안 화면이 그려지는 과정이 사용자에게 보이지 않도록, 별도의 메모리 영역에서 렌더링을 수행한다. 이미지가 완전히 완성되면 그때 화면에 복사한다 — 이를 **더블 버퍼링(Double Buffering)** 이라고 한다.
+버텍스 하나에는 아래 데이터가 담겨 있다:
+
+```jsx
+Vertex Buffer
+└── Vertex 1
+│   ├── Position (Attribute)
+│   ├── UV (Attribute)
+│   ├── Normal (Attribute)
+│   └── ID (Attribute)
+└── Vertex 2
+    ├── Position
+    ├── ...
+```
 
 ---
 
-*출처: [Wikipedia - Graphics pipeline](https://en.wikipedia.org/wiki/Graphics_pipeline)*
+## Draw Call
+
+CPU가 데이터 준비를 마치면 GPU에 **"이 오브젝트 그려!"** 하고 명령을 내린다. 이 명령 하나하나를 **Draw Call**이라 한다.
+
+Draw Call이 발생하는 순간 GPU가 렌더링 파이프라인을 실행하기 시작한다.
+
+<img width="797" height="336" alt="Image" src="https://github.com/user-attachments/assets/514137f3-b58d-4da5-92df-ef221e41d2bf" />
+
+씬에 오브젝트가 여러 개면 Draw Call도 여러 번 발생한다:
+
+```
+CPU → "큐브 그려!"     → Draw Call 1 → 파이프라인 실행
+CPU → "캐릭터 그려!"   → Draw Call 2 → 파이프라인 실행
+CPU → "나무 그려!"     → Draw Call 3 → 파이프라인 실행
+```
+
+> Draw Call이 많을수록 CPU → GPU 통신 비용이 커져 성능에 영향을 준다. 이를 줄이기 위해 여러 오브젝트를 하나의 Draw Call로 묶는 **배칭(Batching)** 최적화를 사용한다.
+> 
+
+---
+
+## 1. Vertex Shader (버텍스 쉐이더)
+
+메시의 **각 버텍스마다 실행**된다.
+
+주요 역할은 버텍스의 **좌표 공간 변환**이다. 아래 순서로 변환이 일어난다
+
+![Coordinate Systems](https://learnopengl.com/img/getting-started/coordinate_systems.png)
+
+{: width="600" }
+
+*출처: [LearnOpenGL - Coordinate Systems](https://learnopengl.com/Getting-started/Coordinate-Systems)*
+
+| **Model Space** (Local Space) | 오브젝트 자체 기준 좌표. 원점이 오브젝트 중심 |
+| --- | --- |
+| **World Space** | 씬 전체 기준 좌표. World Transform 행렬로 변환 |
+| **View Space** | 카메라 기준 좌표. View Transform 행렬로 변환 |
+| **Clip Space** | 화면에 보일 영역을 기준으로 자르기 위한 좌표. Projection Transform으로 변환 |
+
+이 세 변환을 하나로 합친 것이 **WVP(World-View-Projection) 행렬**이다.
+
+> Shader Graph에서 Position 포트(Vertex 단계)가 바로 이 Vertex Shader의 출력을 제어하는 곳이다.
+> 
+
+---
+
+## 2. Tessellation (테셀레이션) — 선택적 단계
+
+삼각형을 더 작은 삼각형으로 **세분화**해 메시의 디테일을 높이는 단계. 카메라 거리에 따라 디테일을 조절하는 LOD(Level of Detail)에 활용된다.
+
+Hull Shader → Tessellator → Domain Shader 순으로 처리된다.
+
+> Shader Graph에서는 아직 지원하지 않는다.
+> 
+
+---
+
+## 3. Geometry Shader (지오메트리 쉐이더) — 선택적 단계
+
+버텍스/삼각형으로부터 **새로운 지오메트리(점, 선, 삼각형)를 생성**할 수 있는 단계. 풀(grass), 파티클 등 구현에 사용되나 성능 비용이 크다.
+
+> Shader Graph에서는 아직 지원하지 않는다.
+> 
+
+---
+
+## 4. Rasterisation (래스터화)
+
+**고정 단계** — 프로그래밍 불가, GPU가 자동으로 처리.
+
+Clip Space의 3D 버텍스 좌표를 2D 화면의 **픽셀(Fragment)들로 변환**하는 과정이다.
+
+주요 처리 내용:
+
+- **클리핑** : 화면 밖 영역(절두체 외부)의 폴리곤 제거
+- **Face Culling** : 카메라를 등진 뒷면 폴리곤 제거 (Counter Clockwise 기준)
+- **Fragment 생성** : 삼각형이 차지하는 픽셀마다 Fragment 생성
+- **보간(Interpolation)** : 버텍스 데이터(UV, 색상, 노멀 등)를 Fragment 전체에 보간
+
+---
+
+## 5. Fragment Shader (프래그먼트 쉐이더)
+
+화면의 **각 픽셀(Fragment)마다 실행**된다. DirectX에서는 **Pixel Shader**라고 부른다.
+
+최종 픽셀의 **색상**을 결정하는 단계로, 쉐이더 프로그래밍의 핵심이다.
+
+주요 역할:
+
+- 텍스처 샘플링 (UV를 이용해 텍스처 색상 가져오기)
+- 라이팅 계산
+- 알파 클리핑 (특정 픽셀 제거)
+
+> "쉐이더(Shader)"라는 이름 자체가 이 단계의 음영(Shading) 계산에서 유래했다.
+> 
+
+---
+
+## Material과 Shader의 구분
+
+머테리얼(Material)과 쉐이더(Shader)는 다르다.
+
+유니티에서 **머테리얼**은 텍스처, 컬러, 쉐이더를 모두 포함할 수 있는 컨테이너다. **쉐이더**는 머테리얼의 구성요소 중 하나일 뿐이다.
+
+```
+Material = { Texture, Color, Shader, ... }
+```
+
+즉, 머테리얼 ≠ 쉐이더이며, 쉐이더는 머테리얼 안에 속하는 개념이다.
+
+---
+
+## 출처
+
+- [Render Hell – Book I](https://simonschreibt.de/gat/renderhell-book1/) — Simon Schreibt
+- [유튜브 강의](https://www.youtube.com/watch?v=r_eatgPFQYg)
+- [Coordinate Systems](https://learnopengl.com/Getting-started/Coordinate-Systems) — LearnOpenGL
+- [Polygon mesh](https://en.wikipedia.org/wiki/Polygon_mesh) — Wikipedia
